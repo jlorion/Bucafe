@@ -3,5 +3,24 @@
     "java.project.outputPath": "bin",
     "java.project.referencedLibraries": [
         "lib/**/*.jar"
-    ]
+    ],
+   
+    "workbench.colorTheme": "Monokai",
+    "vim.leader": "<space>",
+    "editor.lineNumbers": "relative",
+    "nerdtree.alwaysShowSidebar": true,
+    "vim.easymotion": true,
+    "vim.foldfix": true,
+    "vim.handleKeys": {
+        "<C-d>": true,
+        "<C-s>": true,
+        "<C-z>": false,
+        "<C-w>": false,
+        "<C-i>": false,
+        "<C-k>": false
+
+    },
+    "window.zoomLevel": -1,
+    "redhat.telemetry.enabled": false
+
 }

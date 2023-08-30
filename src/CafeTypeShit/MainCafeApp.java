@@ -16,6 +16,8 @@ import java.awt.print.PrinterJob;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.logging.Level;
@@ -25,7 +27,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
-
+import java.sql.*;
 public class MainCafeApp extends javax.swing.JFrame {
     ItemStructure barang;
     SalesStructure penjualan=new SalesStructure();
@@ -229,6 +231,16 @@ public class BillPrintable implements Printable {
         jLabel14 = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
 
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root",  "");
+            Statement state = con.createStatement();
+            System.out.println("connected");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Cafe Cashiering and inventory system");
         setBackground(new java.awt.Color(255, 255, 153));
@@ -343,6 +355,13 @@ public class BillPrintable implements Printable {
         btnBayar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnBayarActionPerformed(evt);//ToDO: add flag and eroor event when total payable > cash pay
+                //TODO:make a function with paameters 
+                for (int i = 0; i < penjualan.getTabel().getColumnCount(); i++) {
+                    System.out.println(penjualan.getTabel().getValueAt(i, 0));//TODO: loop is good make a function to add data to db
+                }
+                double cash = Integer.parseInt(txtTunai.getText());
+                total = penjualan.countTotal();
+                double changeCash = tunai - total;
             }
         });
         btnBayar.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -559,7 +578,14 @@ public class BillPrintable implements Printable {
     }//GEN-LAST:event_chkPPNActionPerformed
 
     private void btnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusActionPerformed
-        penjualan.getTabel().removeRow(tblBarang.getSelectedRow());
+        
+            penjualan.getTabel().removeRow(tblBarang.getSelectedRow());
+        // for (int i = 0; i <= penjualan.getTabel().getRowCount()+1; i++) {
+        //     penjualan.getTabel().removeRow(0);
+        // TODO: make a clear button to clear everything add it in the bottom part beside print receipt!!
+
+        // }
+
         lblSubtotal.setText(NumberFormat.getNumberInstance().format(penjualan.countSubtotal()));
         chkPPNActionPerformed(null);
     }//GEN-LAST:event_btnHapusActionPerformed
