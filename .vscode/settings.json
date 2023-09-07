@@ -17,7 +17,9 @@
         "<C-z>": false,
         "<C-w>": false,
         "<C-i>": false,
-        "<C-k>": false
+        "<C-k>": false,
+        "<C-f>": false
+
 
     },
     "window.zoomLevel": -1,
