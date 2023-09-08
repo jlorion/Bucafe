@@ -20,6 +20,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
@@ -44,24 +46,23 @@ public class MainCafeApp extends javax.swing.JFrame {
         tblBarang.setModel(penjualan.getTabel());
         
     }
-   //TODO: make it so that it integrates with the database and you can add and remove menu itemes 
+   //DONE: make it so that it integrates with the database and you can add and remove menu itemes 
     private void fillComboBarang(){
-        //Plan: Make a function to add and convert ItemStructure to db and vise versa
-        ItemStructure barang1 = new ItemStructure("Paha Bawah", "pcs", 8182);
-        ItemStructure barang2 = new ItemStructure("Nasi + Paha Bawah", "pcs", 10909);
-        ItemStructure barang3 = new ItemStructure("Nasi + Sayap ", "pcs", 10000);
-        ItemStructure barang4 = new ItemStructure("Nasi + Paha Bawah Marathon", "pcs", 12727);
-        ItemStructure barang5 = new ItemStructure("Nasi + Sayap Marathon", "pcs", 11818);
-        ItemStructure barang6 = new ItemStructure("Orange Quash", "pcs", 4545);
-        ItemStructure barang7 = new ItemStructure("Iced Green Tea Latte", "pcs", 7273);
-        //PLAN: Make it so that cboBarang loops to db query of menut items then add each one
-        cboBarang.addItem(barang1);
-        cboBarang.addItem(barang2);
-        cboBarang.addItem(barang3);
-        cboBarang.addItem(barang4);
-        cboBarang.addItem(barang5);
-        cboBarang.addItem(barang6);
-        cboBarang.addItem(barang7);
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root",  "");
+            Statement state = con.createStatement();
+            System.out.println("connected");
+            DataCom data = new DataCom();
+            ArrayList<Map<String, Object>> menuData = data.getMenu(con);
+            System.out.println(menuData);
+            menuData.forEach(x -> {
+                ItemStructure barang = new ItemStructure(x.get("Name").toString() , "pcs", Integer.parseInt(x.get("Price").toString()));
+                cboBarang.addItem(barang);
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     public PageFormat getPageFormat(PrinterJob pj){
     
