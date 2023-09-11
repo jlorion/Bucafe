@@ -1,6 +1,7 @@
 package CafeTypeShit;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -36,4 +37,21 @@ public class DataCom {
     return allMenu;
   }
   
+  public void postPurchase(Connection Conn, double total, double cash, double moneyback){
+
+    String query = "INSERT INTO purchases (total, cash, moneyback) VALUES (?, ?, ?)";
+
+    try (PreparedStatement preparedStatement = Conn.prepareStatement(query)){
+    preparedStatement.setDouble(1, total); // Set the value for column1
+    preparedStatement.setDouble(2, cash); // Set the value for column2
+    preparedStatement.setDouble(3, moneyback); // Set the value for column3
+    
+    int rowsAffected = preparedStatement.executeUpdate();
+ 
+    System.out.println(rowsAffected + " row(s) inserted.");
+} catch (SQLException e) {
+    e.printStackTrace();
+}
+
+  }
 }

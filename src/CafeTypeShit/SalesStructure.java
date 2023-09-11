@@ -17,6 +17,8 @@ public class SalesStructure {
         getTabel().addColumn("Amount");
         getTabel().addColumn("Unit");
         getTabel().addColumn("Total Price");
+        getTabel().addColumn("ID");
+
     }
 
     public double countSubtotal(){

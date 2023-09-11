@@ -5,6 +5,15 @@ public class ItemStructure {
     private String nameSale;
     private double price;
     private String unit;
+    private int id;
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+
     public double getPrice() {
         return price;
     }
@@ -30,10 +39,11 @@ public class ItemStructure {
     }
 
 
-    public ItemStructure(String nameSale, String unit, double price){
+    public ItemStructure(String nameSale, String unit, double price, int id){
         this.nameSale = nameSale;
         this.unit = unit;
         this.price = price;
+        this.id = id;
     }
 
     @Override

@@ -16,8 +16,6 @@ import java.awt.print.PrinterJob;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -39,27 +37,33 @@ public class MainCafeApp extends javax.swing.JFrame {
     private double total=0;
     private DefaultTableModel tabel = new DefaultTableModel();
     private double tunai;
+    DataCom datacoms = new DataCom();
 
     public MainCafeApp() {
         initComponents();
         fillComboBarang();
         tblBarang.setModel(penjualan.getTabel());
+        tblBarang.removeColumn(tblBarang.getColumnModel().getColumn(5));
+        // tblBarang.getColumnModel().getColumn(5).setMaxWidth(0);
+        // tblBarang.getColumnModel().getColumn(5).setMinWidth(0);
         
     }
    //DONE: make it so that it integrates with the database and you can add and remove menu itemes 
     private void fillComboBarang(){
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root",  "");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cafeting", "root",  "");
             Statement state = con.createStatement();
             System.out.println("connected");
-            DataCom data = new DataCom();
-            ArrayList<Map<String, Object>> menuData = data.getMenu(con);
+            
+            ArrayList<Map<String, Object>> menuData = datacoms.getMenu(con);
             System.out.println(menuData);
             menuData.forEach(x -> {
-                ItemStructure barang = new ItemStructure(x.get("Name").toString() , "pcs", Integer.parseInt(x.get("Price").toString()));
+
+                ItemStructure barang = new ItemStructure(x.get("Name").toString() , "pcs", (int)x.get("Price"), (int) x.get("ID"));
                 cboBarang.addItem(barang);
             });
+            con.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -233,14 +237,7 @@ public class BillPrintable implements Printable {
         jLabel15 = new javax.swing.JLabel();
 
 
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root",  "");
-            Statement state = con.createStatement();
-            System.out.println("connected");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+              
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Cafe Cashiering and inventory system");
@@ -286,16 +283,18 @@ public class BillPrintable implements Printable {
 
         tblBarang.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
             },
             new String [] {
-                "Menu", "Price", "Amount", "Unit", "Total Price"
+                "Menu", "Price", "Amount", "Unit", "Total Price", "ID"
 
             }
         ));
+        
+
         jScrollPane1.setViewportView(tblBarang);
 
         btnSimpan.setText("Save");
@@ -356,13 +355,24 @@ public class BillPrintable implements Printable {
         btnBayar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnBayarActionPerformed(evt);//ToDO: add flag and eroor event when total payable > cash pay
-                //TODO:make a function with paameters 
-                for (int i = 0; i < penjualan.getTabel().getColumnCount(); i++) {
-                    System.out.println(penjualan.getTabel().getValueAt(i, 0));//TODO: loop is good make a function to add data to db
-                }
                 double cash = Integer.parseInt(txtTunai.getText());
                 total = penjualan.countTotal();
-                double changeCash = tunai - total;
+                double changeCash = cash - total;
+                try {
+                    Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cafeting", "root", "");
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    datacoms.postPurchase(con, total, cash, changeCash);
+                                
+                    con.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                //SUTODO:make a function with paameters 
+                for (int i = 0; i <= penjualan.getTabel().getColumnCount(); i++) {
+                    //push dis data and assign each id values for id make a func on datacom to get id of the last added purchasess store it in an int 
+                    System.out.println(penjualan.getTabel().getValueAt(i, 5));//TODO: loop is good make a function to add data to db
+                }
             }
         });
         btnBayar.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -546,7 +556,7 @@ public class BillPrintable implements Printable {
     }//GEN-LAST:event_cboBarangActionPerformed
 
     private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
-        String[] data = new String[5];
+        String[] data = new String[6];
         double harga, jumlah=0;
         int qty=0;
         
@@ -558,6 +568,7 @@ public class BillPrintable implements Printable {
         data[3]=barang.getUnit();
         jumlah=harga*qty;
         data[4]=String.valueOf(jumlah);
+        data[5]= String.valueOf(barang.getId());
         
         penjualan.getTabel().addRow(data);
         lblSubtotal.setText(NumberFormat.getNumberInstance().format(penjualan.countSubtotal()));
