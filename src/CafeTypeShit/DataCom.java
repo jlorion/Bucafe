@@ -37,21 +37,55 @@ public class DataCom {
     return allMenu;
   }
   
-  public void postPurchase(Connection Conn, double total, double cash, double moneyback){
+  public int postPurchase(Connection Conn, double total, double cash, double moneyback){
 
     String query = "INSERT INTO purchases (total, cash, moneyback) VALUES (?, ?, ?)";
-
-    try (PreparedStatement preparedStatement = Conn.prepareStatement(query)){
-    preparedStatement.setDouble(1, total); // Set the value for column1
-    preparedStatement.setDouble(2, cash); // Set the value for column2
-    preparedStatement.setDouble(3, moneyback); // Set the value for column3
     
-    int rowsAffected = preparedStatement.executeUpdate();
- 
-    System.out.println(rowsAffected + " row(s) inserted.");
-} catch (SQLException e) {
-    e.printStackTrace();
-}
+    int id = 0;
+    try (PreparedStatement preparedStatement = Conn.prepareStatement((query), Statement.RETURN_GENERATED_KEYS)) {
+      preparedStatement.setDouble(1, total); // Set the value for column1
+      preparedStatement.setDouble(2, cash); // Set the value for column2
+      preparedStatement.setDouble(3, moneyback); // Set the value for column3
 
+      int rowsAffected = preparedStatement.executeUpdate();
+      try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+        if (generatedKeys.next()) {
+          id = generatedKeys.getInt(1);
+          // System.out.println(id);
+          return id;
+        } else {
+          throw new SQLException("Creating user failed, no ID obtained.");
+        }
+      }
+      // System.out.println(rowsAffected + " row(s) inserted.");
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return id;
+
+  }
+
+
+  public void pushOrders(Connection con, int purchase_id, int menu_id, int amount, double item_total){
+
+    String query = "INSERT INTO orders (purchase_id, menu_id, amount, item_total) VALUES (?, ?, ?, ?)";
+
+    try(PreparedStatement ptmt = con.prepareStatement((query))) {
+      ptmt.setInt(1, purchase_id);
+      ptmt.setInt(2, menu_id);
+      ptmt.setInt(3, amount);
+      ptmt.setDouble(4, item_total);
+      int rowsAffected = ptmt.executeUpdate();
+      System.out.println(rowsAffected + " row(s) inserted.");
+   
+      
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+
+
+
+   
   }
 }

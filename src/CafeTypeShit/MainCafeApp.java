@@ -361,18 +361,22 @@ public class BillPrintable implements Printable {
                 try {
                     Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cafeting", "root", "");
                     Class.forName("com.mysql.cj.jdbc.Driver");
-                    datacoms.postPurchase(con, total, cash, changeCash);
-                                
+                    int purchase_id = datacoms.postPurchase(con, total, cash, changeCash);
+                      
+
+                    for (int i = 0; i <= penjualan.getTabel().getRowCount() -1; i++) {
+                        //push dis data and assign each id values for id make a func on datacom to get id of the last added purchasess store it in an int 
+                        int menu_id = Integer.parseInt(penjualan.getTabel().getValueAt(i, 5).toString());
+                        int amount = Integer.parseInt(penjualan.getTabel().getValueAt(i, 2).toString());
+                        double item_total = Double.parseDouble(penjualan.getTabel().getValueAt(i, 4).toString());
+                        datacoms.pushOrders(con, purchase_id, menu_id, amount, item_total);
+                    }
                     con.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
                 //SUTODO:make a function with paameters 
-                for (int i = 0; i <= penjualan.getTabel().getColumnCount(); i++) {
-                    //push dis data and assign each id values for id make a func on datacom to get id of the last added purchasess store it in an int 
-                    System.out.println(penjualan.getTabel().getValueAt(i, 5));//TODO: loop is good make a function to add data to db
-                }
             }
         });
         btnBayar.addKeyListener(new java.awt.event.KeyAdapter() {
