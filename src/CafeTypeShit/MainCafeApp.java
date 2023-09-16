@@ -46,6 +46,7 @@ public class MainCafeApp extends javax.swing.JFrame {
     private DefaultTableModel tabel = new DefaultTableModel();
     private double tunai;
     DataCom datacoms = new DataCom();
+    
 
     public MainCafeApp() {
     	setResizable(false);
@@ -53,6 +54,8 @@ public class MainCafeApp extends javax.swing.JFrame {
         fillComboBarang();
         tblBarang.setModel(penjualan.getTabel());
         tblBarang.removeColumn(tblBarang.getColumnModel().getColumn(5));
+
+
         // tblBarang.getColumnModel().getColumn(5).setMaxWidth(0);
         // tblBarang.getColumnModel().getColumn(5).setMinWidth(0);
         
@@ -62,15 +65,21 @@ public class MainCafeApp extends javax.swing.JFrame {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cafeting", "root",  "");
-            Statement state = con.createStatement();
             System.out.println("connected");
             
             ArrayList<Map<String, Object>> menuData = datacoms.getMenu(con);
-            System.out.println(menuData);
+            
             menuData.forEach(x -> {
-
+                if(x.get("class").equals("espresso")) System.out.println(x);
                 ItemStructure barang = new ItemStructure(x.get("Name").toString() , "pcs", (int)x.get("Price"), (int) x.get("ID"));
                 cboBarang.addItem(barang);
+                
+            });
+            cboBarang.setSelectedItem(null);
+            categories.addItemListener(e -> {
+
+
+
             });
             con.close();
         } catch (Exception e) {
@@ -243,6 +252,7 @@ public class BillPrintable implements Printable {
         lblKembali = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
+        categories = new JComboBox();
 
 
               
@@ -416,8 +426,9 @@ public class BillPrintable implements Printable {
         btnNewButton_1 = new JButton("New Sale");
         btnNewButton_1.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		
-        		for (int i = 0; i <= penjualan.getTabel().getRowCount(); i++) {
+        		int tableLength = penjualan.getTabel().getRowCount();
+        		for (int i = 0; i < tableLength; i++) {
+                    
         	        penjualan.getTabel().removeRow(0);
         		}
         		
@@ -429,7 +440,7 @@ public class BillPrintable implements Printable {
        String[] r = {"All ITems", "Espresso", "Cakes", "Breads"};
        
         
-        JComboBox categories = new JComboBox();
+       
         for(String s : r) {
         categories.addItem(s);
         }
@@ -629,16 +640,20 @@ public class BillPrintable implements Printable {
         String[] data = new String[6];
         double harga, jumlah=0;
         int qty=0;
-        
-        data[0]=barang.getNameSale();
-        harga=barang.getPrice();
-        data[1]=String.valueOf(barang.getPrice());
-        qty=Integer.parseInt(txtQuantity.getText());
-        data[2]=txtQuantity.getText();
-        data[3]=barang.getUnit();
-        jumlah=harga*qty;
-        data[4]=String.valueOf(jumlah);
-        data[5]= String.valueOf(barang.getId());
+        try {
+            data[0]=barang.getNameSale();
+            harga=barang.getPrice();
+            data[1]=String.valueOf(barang.getPrice());
+            qty=Integer.parseInt(txtQuantity.getText());
+            data[2]=txtQuantity.getText();
+            data[3]=barang.getUnit();
+            jumlah=harga*qty;
+            data[4]=String.valueOf(jumlah);
+            data[5]= String.valueOf(barang.getId());
+        } catch (Exception e) {
+            System.out.println(e);
+            JOptionPane.showMessageDialog(cboBarang, "Error", "WARNING", JOptionPane.WARNING_MESSAGE);
+        }
         
         penjualan.getTabel().addRow(data);
         lblSubtotal.setText(NumberFormat.getNumberInstance().format(penjualan.countSubtotal()));
@@ -748,6 +763,7 @@ public class BillPrintable implements Printable {
     private javax.swing.JTextField txtQuantity;
     private javax.swing.JTextField txtTunai;
     private JButton btnNewButton_1;
+    private JComboBox categories;
     // End of variables declaration//GEN-END:variables
 
     private double getTotal(String format) {

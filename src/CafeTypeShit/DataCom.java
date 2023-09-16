@@ -24,9 +24,13 @@ public class DataCom {
         int id = rs.getInt("id");
         String itemName = rs.getString("Name");
         int price = rs.getInt("price");
+        int inventory = rs.getInt("inventory");
+        String classify = rs.getString("classifier");
         menu.put("ID", id);
         menu.put("Name", itemName);
         menu.put("Price", price);
+        menu.put("inventory", inventory);
+        menu.put("class", classify);
         allMenu.add(menu);       
       }
       st.close();
