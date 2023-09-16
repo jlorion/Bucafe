@@ -46,12 +46,27 @@ public class MainCafeApp extends javax.swing.JFrame {
     private DefaultTableModel tabel = new DefaultTableModel();
     private double tunai;
     DataCom datacoms = new DataCom();
+    private String[] category = {"All Items", "espresso", "cake", "bread"};
     
 
     public MainCafeApp() {
+        ArrayList<Map<String, Object>> menuData = new ArrayList<>();
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cafeting", "root",  "");
+            System.out.println("connected");
+            
+            menuData = datacoms.getMenu(con);
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     	setResizable(false);
         initComponents();
-        fillComboBarang();
+        fillComboBarang(menuData);
         tblBarang.setModel(penjualan.getTabel());
         tblBarang.removeColumn(tblBarang.getColumnModel().getColumn(5));
 
@@ -61,27 +76,54 @@ public class MainCafeApp extends javax.swing.JFrame {
         
     }
    //DONE: make it so that it integrates with the database and you can add and remove menu itemes 
-    private void fillComboBarang(){
+    private void fillComboBarang(ArrayList<Map<String, Object>> menuData){
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cafeting", "root",  "");
-            System.out.println("connected");
             
-            ArrayList<Map<String, Object>> menuData = datacoms.getMenu(con);
             
-            menuData.forEach(x -> {
-                if(x.get("class").equals("espresso")) System.out.println(x);
-                ItemStructure barang = new ItemStructure(x.get("Name").toString() , "pcs", (int)x.get("Price"), (int) x.get("ID"));
-                cboBarang.addItem(barang);
+            // menuData.forEach(x -> {
+            //     ItemStructure barang = new ItemStructure(x.get("Name").toString() , "pcs", (int)x.get("Price"), (int) x.get("ID"));
+            //     cboBarang.addItem(barang);
                 
+            // });
+            // cboBarang.setSelectedItem(null);
+            categories.addActionListener(e -> {
+
+                cboBarang.removeAllItems();
+                if (categories.getSelectedItem().equals(category[0])){
+                    menuData.forEach(x -> {
+                        ItemStructure barang = new ItemStructure(x.get("Name").toString() , "pcs", (int)x.get("Price"), (int) x.get("ID"));
+                        cboBarang.addItem(barang);
+                    });
+                    
+                }else if (categories.getSelectedItem().equals(category[1])) {
+                    
+                    menuData.forEach(x-> {
+                        if (x.get("class").equals(category[1])) {
+                            ItemStructure barang = new ItemStructure(x.get("Name").toString() , "pcs", (int)x.get("Price"), (int) x.get("ID"));
+                            cboBarang.addItem(barang);
+                        }
+                    });
+                    
+                }else if (categories.getSelectedItem().equals(category[2])) {
+                    
+                    menuData.forEach(x-> {
+                        if (x.get("class").equals(category[2])) {
+                            ItemStructure barang = new ItemStructure(x.get("Name").toString() , "pcs", (int)x.get("Price"), (int) x.get("ID"));
+                            cboBarang.addItem(barang);
+                        }
+                    });
+                    
+                }else if (categories.getSelectedItem().equals(category[3])) {
+                   
+                    menuData.forEach(x-> {
+                        if (x.get("class").equals(category[3])) {
+                            ItemStructure barang = new ItemStructure(x.get("Name").toString() , "pcs", (int)x.get("Price"), (int) x.get("ID"));
+                            cboBarang.addItem(barang);
+                        }
+                    });
+                    
+                }
             });
-            cboBarang.setSelectedItem(null);
-            categories.addItemListener(e -> {
-
-
-
-            });
-            con.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -253,9 +295,7 @@ public class BillPrintable implements Printable {
         jLabel14 = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
         categories = new JComboBox();
-
-
-              
+        
         
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Cafe Cashiering and inventory system");
@@ -437,13 +477,13 @@ public class BillPrintable implements Printable {
         		
         	}
         }); 
-       String[] r = {"All ITems", "Espresso", "Cakes", "Breads"};
        
+       
+       for(String s : category) {
+       categories.addItem(s);
+       }
         
        
-        for(String s : r) {
-        categories.addItem(s);
-        }
         
         JLabel lblNewLabel = new JLabel("New label");
         lblNewLabel.setIcon(new ImageIcon("C:\\Users\\User\\Downloads\\LOGO.png"));
