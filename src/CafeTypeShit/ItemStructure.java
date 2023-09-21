@@ -6,6 +6,15 @@ public class ItemStructure {
     private double price;
     private String unit;
     private int id;
+    private String category;
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -39,11 +48,13 @@ public class ItemStructure {
     }
 
 
-    public ItemStructure(String nameSale, String unit, double price, int id){
+    public ItemStructure(String nameSale, String unit, double price, int id, String category){
         this.nameSale = nameSale;
         this.unit = unit;
         this.price = price;
         this.id = id;
+        this.category = category;
+
     }
 
     @Override

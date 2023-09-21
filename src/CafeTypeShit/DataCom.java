@@ -1,6 +1,7 @@
 package CafeTypeShit;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,10 +10,31 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.tree.ExpandVetoException;
+
 public class DataCom {
 
-    public ArrayList<Map<String, Object>> getMenu(Connection conn){
-    ArrayList<Map<String, Object>> allMenu= new ArrayList<>();
+  public Connection getConnection(){
+    Connection con;
+     try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cafeting", "root",  "");
+            System.out.println("connected");
+            return con;
+      }catch(Exception ex){
+        System.err.println(ex);
+      }
+
+
+    return null;
+      
+
+
+
+  }
+
+    public ArrayList<ItemStructure> getMenu(Connection conn){
+    ArrayList<ItemStructure> allMenu= new ArrayList<>();
     
     String query = "SELECT * FROM menu";
     try {
@@ -20,17 +42,13 @@ public class DataCom {
       ResultSet rs = st.executeQuery(query);
         while (rs.next())
         {
-        Map<String, Object> menu = new HashMap<>();
+        
         int id = rs.getInt("id");
         String itemName = rs.getString("Name");
         int price = rs.getInt("price");
         int inventory = rs.getInt("inventory");
         String classify = rs.getString("classifier");
-        menu.put("ID", id);
-        menu.put("Name", itemName);
-        menu.put("Price", price);
-        menu.put("inventory", inventory);
-        menu.put("class", classify);
+        ItemStructure menu = new ItemStructure(itemName, "pcs", price, id, classify);
         allMenu.add(menu);       
       }
       st.close();
@@ -87,9 +105,26 @@ public class DataCom {
       e.printStackTrace();
     }
 
-
-
-
-   
   }
+  public ArrayList<String> getCategories(Connection conn){
+
+    String query = "SELECT * FROM categorization";
+    ArrayList<String> categories = new ArrayList<>();
+
+    try {
+      Statement st = conn.createStatement();
+      ResultSet rs = st.executeQuery(query);
+        while (rs.next()){
+          String category = rs.getString("Class_name");
+          categories.add(category);
+        }
+        return categories;
+      }catch(Exception err){
+        System.err.println(err);
+      }
+    return null;
+    
+  }
+  
+
 }
