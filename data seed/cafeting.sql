@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 16, 2023 at 07:41 AM
+-- Generation Time: Sep 22, 2023 at 06:28 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.0.28
 
@@ -20,6 +20,27 @@ SET time_zone = "+00:00";
 --
 -- Database: `cafeting`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `categorization`
+--
+
+CREATE TABLE `categorization` (
+  `id` int(100) NOT NULL,
+  `Class_name` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `categorization`
+--
+
+INSERT INTO `categorization` (`id`, `Class_name`) VALUES
+(1, 'All Items'),
+(2, 'breads'),
+(3, 'espresso'),
+(4, 'cake');
 
 -- --------------------------------------------------------
 
@@ -43,7 +64,7 @@ INSERT INTO `menu` (`id`, `Name`, `price`, `inventory`, `classifier`) VALUES
 (1, 'Red Velvet Cake', 300, 100, 'cake'),
 (2, 'Chocolate Cake', 150, 100, 'cake'),
 (3, 'Machiatto', 50, 100, 'espresso'),
-(4, 'Iced Americano ', 140, 100, 'espresso '),
+(4, 'Iced Americano ', 140, 100, 'espresso'),
 (5, 'Croissant ', 150, 100, 'breads'),
 (6, 'chocolanay ', 55, 100, 'breads');
 
@@ -69,7 +90,15 @@ INSERT INTO `orders` (`purchase_id`, `menu_id`, `amount`, `item_total`) VALUES
 (1, 2, 1, 0),
 (1, 3, 1, 0),
 (2, 2, 1, 0),
-(2, 3, 4, 0);
+(2, 3, 4, 0),
+(6, 3, 1, 50),
+(6, 4, 2, 280),
+(6, 6, 2, 110),
+(6, 6, 2, 110),
+(7, 5, 1, 150),
+(8, 1, 1, 300),
+(9, 3, 1, 50),
+(10, 4, 1, 140);
 
 -- --------------------------------------------------------
 
@@ -93,11 +122,22 @@ INSERT INTO `purchases` (`id`, `total`, `cash`, `moneyback`, `datentime`) VALUES
 (1, 500, 1000, 500, '2023-09-06 14:40:10'),
 (2, 350, 500, 150, '2023-09-06 14:40:10'),
 (4, 701, 1000, -701, '2023-09-11 23:23:05'),
-(5, 301, 500, 199, '2023-09-12 00:04:04');
+(5, 301, 500, 199, '2023-09-12 00:04:04'),
+(6, 551, 500, -51, '2023-09-21 15:28:35'),
+(7, 151, 151, 0, '2023-09-21 15:54:27'),
+(8, 301, 400, 99, '2023-09-21 16:28:02'),
+(9, 51, 51, 0, '2023-09-21 16:28:48'),
+(10, 141, 150, 9, '2023-09-21 16:30:06');
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `categorization`
+--
+ALTER TABLE `categorization`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `menu`
@@ -123,6 +163,12 @@ ALTER TABLE `purchases`
 --
 
 --
+-- AUTO_INCREMENT for table `categorization`
+--
+ALTER TABLE `categorization`
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT for table `menu`
 --
 ALTER TABLE `menu`
@@ -132,7 +178,7 @@ ALTER TABLE `menu`
 -- AUTO_INCREMENT for table `purchases`
 --
 ALTER TABLE `purchases`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Constraints for dumped tables

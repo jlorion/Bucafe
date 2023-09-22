@@ -59,8 +59,7 @@ public class MainCafeApp extends javax.swing.JFrame {
         tblBarang.removeColumn(tblBarang.getColumnModel().getColumn(5));
 
 
-        // tblBarang.getColumnModel().getColumn(5).setMaxWidth(0);
-        // tblBarang.getColumnModel().getColumn(5).setMinWidth(0);
+   
         
     }
    //DONE: make it so that it integrates with the database and you can add and remove menu itemes 
@@ -68,12 +67,12 @@ public class MainCafeApp extends javax.swing.JFrame {
         try {
             Connection conn = datacoms.getConnection();
             ArrayList<ItemStructure> menuData = datacoms.getMenu(conn);
-            // menuData.forEach(x -> {
-            //     ItemStructure barang = x;
-            //     System.out.println(x.getNameSale());
-            //     cboBarang.addItem(barang);
+            menuData.forEach(x -> {
+                ItemStructure barang = x;
+                System.out.println(x.getNameSale());
+                cboBarang.addItem(barang);
                 
-            // });
+            });
             
             categories.addActionListener(e -> {
 
@@ -138,6 +137,7 @@ public class BillPrintable implements Printable {
 
     public int print(Graphics graphics, PageFormat pageFormat,int pageIndex)  throws PrinterException {    
       
+        
                 
         
       int result = NO_SUCH_PAGE;    
@@ -178,14 +178,14 @@ public class BillPrintable implements Printable {
             
                 // TODO: make this resposive to query on recent sale frome the db 
             g2d.setFont(new Font("Monospaced",Font.PLAIN,9));
-            g2d.drawString("            Quick Chicken           ",12,y);y+=yShift;
+            g2d.drawString("            COFFEE THINGS           ",12,y);y+=yShift;
             g2d.drawString("=====================================",12,y);y+=yShift;
-            g2d.drawString("            C Puseur Jaya           ",12,y);y+=yShift;
-            g2d.drawString("            08112571383             ",12,y);y+=yShift;
+            g2d.drawString("           Official Reciept          ",12,y);y+=yShift;
+            g2d.drawString("            08*********             ",12,y);y+=yShift;
             g2d.drawString("=====================================",12,y);y+=headerRectHeight;
             g2d.drawString("Counter #                           ",12,y);y+=yShift;
             g2d.drawString("======================================",10,y);y+=yShift;
-            g2d.drawString("   Tamu                             1",10,y);y+=yShift;
+            g2d.drawString("   Order                             (id)",10,y);y+=yShift;
             g2d.drawString("1 Paha Bawah                    8.182",10,y);y+=yShift;
             g2d.drawString("1 Nasi + Paha Bawah             10.909",10,y);y+=yShift;
             g2d.drawString("1 Nasi + Sayap                  10.000",10,y);y+=yShift;
@@ -198,17 +198,17 @@ public class BillPrintable implements Printable {
             g2d.drawString(" P.Rest 10%                      9.000",10,y);y+=yShift;
             g2d.drawString(" 9 Total                        98.999",10,y);y+=yShift;
             g2d.drawString(" Ella                                  ",10,y);y+=yShift;
-            g2d.drawString(" Dine In                               ",10,y);y+=yShift;
-            g2d.drawString("    Rounding                          1",10,y);y+=yShift;
-            g2d.drawString("    Bayar                       100.000",10,y);y+=yShift;
-            g2d.drawString("    Cash                         99.000",10,y);y+=yShift;
-            g2d.drawString("    Kembali                       1.000",10,y);y+=yShift;
-            g2d.drawString("Selasa      5- 6-2018 20:01:19         ",10,y);y+=yShift;
+            g2d.drawString("                                       ",10,y);y+=yShift;
+            g2d.drawString("                                       ",10,y);y+=yShift;
+            g2d.drawString("                                        ",10,y);y+=yShift;
+            g2d.drawString("    Cash                         100.000",10,y);y+=yShift;
+            g2d.drawString("    Change                       1.000",10,y);y+=yShift;
+            g2d.drawString("Tuesday      5- 6-2018 20:01:19         ",10,y);y+=yShift;
             g2d.drawString("#006771                                ",10,y);y+=yShift;
-            g2d.drawString("         T e r i m a  K a s i h        ",10,y);y+=yShift;
-            g2d.drawString("           Atas Kunjungannya           ",10,y);y+=yShift;
-            g2d.drawString("      Kritik dan saran  0811-250-006   ",10,y);y+=yShift;
-            g2d.drawString("      Info Catering     0811-2572-955  ",10,y);y+=yShift;
+            g2d.drawString("       Thank You For Your Purchase    ",10,y);y+=yShift;
+            g2d.drawString("                                     ",10,y);y+=yShift;
+            g2d.drawString("   Review and Criticsim  09**-***-***  ",10,y);y+=yShift;
+            g2d.drawString("      Info Catering     09**-****-***  ",10,y);y+=yShift;
 
                            
           
@@ -382,22 +382,26 @@ public class BillPrintable implements Printable {
                 double cash = Integer.parseInt(txtTunai.getText());
                 total = penjualan.countTotal();
                 double changeCash = cash - total;
-                try {
-                    Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cafeting", "root", "");
-                    Class.forName("com.mysql.cj.jdbc.Driver");
-                    int purchase_id = datacoms.postPurchase(con, total, cash, changeCash);
-                      
-
-                    for (int i = 0; i <= penjualan.getTabel().getRowCount() -1; i++) {
-                        //push dis data and assign each id values for id make a func on datacom to get id of the last added purchasess store it in an int 
-                        int menu_id = Integer.parseInt(penjualan.getTabel().getValueAt(i, 5).toString());
-                        int amount = Integer.parseInt(penjualan.getTabel().getValueAt(i, 2).toString());
-                        double item_total = Double.parseDouble(penjualan.getTabel().getValueAt(i, 4).toString());
-                        datacoms.pushOrders(con, purchase_id, menu_id, amount, item_total);
+                if (cash < total) {
+                    JOptionPane.showMessageDialog(null, "Cash Is Less Than Total", "ERROR", JOptionPane.ERROR_MESSAGE);
+                } else { 
+                    try {
+                        Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/cafeting", "root", "");
+                        Class.forName("com.mysql.cj.jdbc.Driver");
+                        purchase_id = datacoms.postPurchase(con, total, cash, changeCash);
+                          
+    
+                        for (int i = 0; i <= penjualan.getTabel().getRowCount() -1; i++) {
+                            //push dis data and assign each id values for id make a func on datacom to get id of the last added purchasess store it in an int 
+                            int menu_id = Integer.parseInt(penjualan.getTabel().getValueAt(i, 5).toString());
+                            int amount = Integer.parseInt(penjualan.getTabel().getValueAt(i, 2).toString());
+                            double item_total = Double.parseDouble(penjualan.getTabel().getValueAt(i, 4).toString());
+                            datacoms.pushOrders(con, purchase_id, menu_id, amount, item_total);
+                        }
+                        con.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    con.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
 
                 //SUTODO:make a function with paameters 
@@ -700,6 +704,7 @@ public class BillPrintable implements Printable {
         PrinterJob pj = PrinterJob.getPrinterJob();        
         pj.setPrintable(new BillPrintable(),getPageFormat(pj));
         try {
+            System.out.println(purchase_id);
              pj.print();
           
         }
@@ -771,6 +776,7 @@ public class BillPrintable implements Printable {
     private javax.swing.JTextField txtTunai;
     private JButton btnNewButton_1;
     private JComboBox categories;
+    private int purchase_id;
     // End of variables declaration//GEN-END:variables
 
     private double getTotal(String format) {

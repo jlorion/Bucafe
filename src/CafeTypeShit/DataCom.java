@@ -126,5 +126,11 @@ public class DataCom {
     
   }
   
+  //method for pulling latest data for print job
+  public ArrayList<Object> getLatestPurchase(Connection con, int purchase_id){
+
+    
+    return null;
+  }
 
 }
